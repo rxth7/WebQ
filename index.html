@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebQ - Immersive 3D Web Design</title>
+    <meta name="description" content="WebQ offers professional website design, UI/UX, advertising, poster design, and video editing services through an immersive web experience.">
+
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+         :root {
+            --primary-color: #050816;
+            --secondary-color: #aaa6c3;
+            --tertiary-color: #151030;
+            --accent-color: #915EFF;
+            --font-family: 'Poppins', sans-serif;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: var(--font-family);
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            overflow-x: hidden;
+            cursor: none;
+        }
+        
+        #background-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        /* Preloader */
+        
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease;
+        }
+        
+        .preloader.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--tertiary-color);
+            border-top: 5px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        /* Custom Cursor */
+        
+        .cursor-dot,
+        .cursor-outline {
+            pointer-events: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.3s ease, transform 0.2s ease;
+        }
+        
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-color);
+        }
+        
+        .cursor-outline {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(145, 94, 255, 0.2);
+            border: 2px solid rgba(145, 94, 255, 0.5);
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        /* Header & Navigation */
+        
+        .header {
+            padding: 20px 0;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(5, 8, 22, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #FFFFFF;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+            display: inline-block;
+        }
+        
+        .logo-text:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo-text span {
+            color: var(--accent-color);
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+        
+        .nav-links a {
+            color: #E0E0E0;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease, transform 0.3s ease;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+        
+        .nav-links a:hover {
+            color: var(--accent-color);
+        }
+        /* Hero Section */
+        
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #hero-canvas {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            padding: 100px 20px 0;
+        }
+        
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            color: #FFFFFF;
+        }
+        
+        .hero h1 span {
+            color: var(--accent-color);
+        }
+        
+        .hero p {
+            font-size: 1rem;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+        
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(90deg, #915EFF 0%, #4A4AFF 100%);
+            color: #FFFFFF;
+            padding: 15px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+            border: none;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(145, 94, 255, 0.4);
+        }
+        
+        .cta-button .arrow {
+            margin-left: 8px;
+            opacity: 0;
+            transform: translateX(-15px);
+            transition: all 0.3s ease-out;
+        }
+        
+        .cta-button:hover .arrow {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .dm-note {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        section {
+            padding: 80px 0;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+        /* Services Timeline */
+        
+        .timeline {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 3px;
+            background-color: var(--tertiary-color);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -1.5px;
+        }
+        
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            width: 50%;
+        }
+        
+        .timeline-item:nth-child(odd) {
+            left: 0;
+        }
+        
+        .timeline-item:nth-child(even) {
+            left: 50%;
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            right: -10px;
+            background-color: var(--primary-color);
+            border: 4px solid var(--accent-color);
+            top: 15px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+        
+        .timeline-item:nth-child(even)::after {
+            left: -10px;
+        }
+        
+        .timeline-content {
+            padding: 20px 30px;
+            background: var(--tertiary-color);
+            position: relative;
+            border-radius: 6px;
+        }
+        /* Portfolio Section */
+        
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .portfolio-item-wrapper {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: var(--tertiary-color);
+        }
+        
+        .portfolio-item {
+            display: block;
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        
+        .portfolio-item-wrapper:hover .portfolio-item {
+            transform: scale(1.1);
+        }
+        
+        .portfolio-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 8, 22, 0.7);
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .portfolio-item-wrapper:hover .portfolio-overlay {
+            opacity: 1;
+        }
+        
+        .portfolio-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        /* Reviews Section with Floating Blobs */
+        
+        .reviews {
+            overflow: hidden;
+        }
+        
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(180deg, var(--accent-color), #4A4AFF);
+            filter: blur(80px);
+            opacity: 0.15;
+            z-index: -1;
+            animation: move 20s infinite alternate;
+        }
+        
+        .blob1 {
+            width: 300px;
+            height: 300px;
+            top: 20%;
+            left: 10%;
+        }
+        
+        .blob2 {
+            width: 250px;
+            height: 250px;
+            top: 60%;
+            right: 15%;
+            animation-duration: 15s;
+        }
+        
+        @keyframes move {
+            from {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            to {
+                transform: translate(100px, 50px) rotate(180deg);
+            }
+        }
+        /* About Section with 3D Model */
+        
+        .about-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .about-text {
+            flex: 1;
+            text-align: center;
+        }
+        
+        #about-canvas-container {
+            flex: 1;
+            min-height: 300px;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .footer {
+            background-color: #050515;
+            padding: 40px 0;
+            text-align: center;
+        }
+        
+        .footer .social-links a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        
+        .footer .social-links a:hover {
+            color: var(--accent-color);
+        }
+        
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(50px) scale(0.95);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        /* MOBILE RESPONSIVE STYLES */
+        
+        @media (max-width: 768px) {
+            .timeline::after {
+                left: 20px;
+                /* Position the line correctly */
+            }
+            .timeline-item {
+                width: 100%;
+                padding-left: 60px;
+                /* Give content space from the line */
+                padding-right: 15px;
+            }
+            .timeline-item:nth-child(even) {
+                left: 0%;
+                /* Stack all items on the left */
+            }
+            .timeline-item::after {
+                left: 10px;
+                /* Align the dot on the line */
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .hero h1 {
+                font-size: 4rem;
+            }
+            .hero p {
+                font-size: 1.2rem;
+            }
+            .nav-links {
+                gap: 30px;
+            }
+            .about-container {
+                flex-direction: row;
+                text-align: left;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .nav-links {
+                gap: 40px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="preloader">
+        <div class="loader"></div>
+    </div>
+
+    <canvas id="background-canvas"></canvas>
+
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="#" class="logo-text">Web<span>Q</span></a>
+                <ul class="nav-links">
+                    <li><a href="#services" class="magnetic-link">Services</a></li>
+                    <li><a href="#portfolio" class="magnetic-link">Work</a></li>
+                    <li><a href="#about" class="magnetic-link">About</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <canvas id="hero-canvas"></canvas>
+            <div class="hero-content">
+                <h1 class="animate-on-scroll">Creative Ideas, <br><span>Brilliant</span> Designs.</h1>
+                <p class="animate-on-scroll">We build stunning digital experiences that captivate and convert.</p>
+                <a href="https://www.instagram.com/webq_/?__pwa=1" target="_blank" class="cta-button animate-on-scroll">
+                    <span>Design</span><span class="arrow">→</span>
+                </a>
+                <p class="dm-note animate-on-scroll">Note: DM on Instagram for Design inquiries.</p>
+            </div>
+        </section>
+
+        <section id="services" class="services">
+            <div class="container">
+                <h2 class="section-title animate-on-scroll">What We Do</h2>
+                <div class="timeline">
+                    <div class="timeline-item animate-on-scroll">
+                        <div class="timeline-content">
+                            <h3>Website Design</h3>
+                            <p>Crafting responsive, high-performance websites.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item animate-on-scroll">
+                        <div class="timeline-content">
+                            <h3>UI/UX Design</h3>
+                            <p>Intuitive and beautiful interfaces for your users.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item animate-on-scroll">
+                        <div class="timeline-content">
+                            <h3>Web Advertising</h3>
+                            <p>Strategic ad campaigns that drive traffic.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item animate-on-scroll">
+                        <div class="timeline-content">
+                            <h3>Video Editing</h3>
+                            <p>Professional video editing to tell compelling stories.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item animate-on-scroll">
+                        <div class="timeline-content">
+                            <h3>Brand Identity</h3>
+                            <p>Creating memorable logos and visual styles.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="portfolio" class="portfolio">
+            <div class="container">
+                <h2 class="section-title animate-on-scroll">Our Creations</h2>
+                <div class="portfolio-grid">
+                    <div class="portfolio-item-wrapper animate-on-scroll"><img src="https://cdn.pixabay.com/photo/2025/05/01/17/46/website-9571960_1280.jpg" alt="Website Example" class="portfolio-item" loading="lazy">
+                        <div class="portfolio-overlay">
+                            <div class="portfolio-title">Web Design</div>
+                        </div>
+                    </div>
+                    <div class="portfolio-item-wrapper animate-on-scroll"><img src="https://cdn.pixabay.com/photo/2021/05/04/16/10/user-interface-6229126_1280.jpg" alt="UI/UX Example" class="portfolio-item" loading="lazy">
+                        <div class="portfolio-overlay">
+                            <div class="portfolio-title">UI/UX Design</div>
+                        </div>
+                    </div>
+                    <div class="portfolio-item-wrapper animate-on-scroll"><img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070&auto=format&fit=crop" alt="Poster Example" class="portfolio-item" loading="lazy">
+                        <div class="portfolio-overlay">
+                            <div class="portfolio-title">Web Advertising</div>
+                        </div>
+                    </div>
+                    <div class="portfolio-item-wrapper animate-on-scroll"><img src="https://cdn.pixabay.com/photo/2018/05/29/20/00/ju-joy-3439913_1280.jpg" alt="Brand Identity Example" class="portfolio-item" loading="lazy">
+                        <div class="portfolio-overlay">
+                            <div class="portfolio-title">Poster Design</div>
+                        </div>
+                    </div>
+                    <div class="portfolio-item-wrapper animate-on-scroll"><img src="https://cdn.pixabay.com/photo/2022/01/29/13/08/computer-screen-6977452_1280.jpg" alt="Brand Identity Example" class="portfolio-item" loading="lazy">
+                        <div class="portfolio-overlay">
+                            <div class="portfolio-title">Video Advertising/div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="portfolio-item-wrapper animate-on-scroll"><img src="https://images.unsplash.com/photo-1558655146-364adaf1fcc9?q=80&w=1964&auto=format&fit=crop" alt="Brand Identity Example" class="portfolio-item" loading="lazy">
+                        <div class="portfolio-overlay">
+                            <div class="portfolio-title">Brand Identity</div>
+                        </div>
+                    </div>
+                </div>
+        </section>
+
+        <section id="about" class="about">
+            <div class="container about-container animate-on-scroll">
+                <div class="about-text">
+                    <h2 class="section-title" style="text-align: left;">About WebQ</h2>
+                    <p>We are a passionate team of designers and developers dedicated to helping businesses succeed in the digital world. At WebQ, we blend creativity with technology to deliver solutions that are not only visually stunning but also strategically
+                        effective.
+                    </p>
+                </div>
+                <div id="about-canvas-container"></div>
+            </div>
+        </section>
+
+        <section class="reviews">
+            <div class="blob blob1"></div>
+            <div class="blob blob2"></div>
+            <div class="container">
+                <h2 class="section-title animate-on-scroll">What Clients Say</h2>
+                <div class="review-card animate-on-scroll">
+                    <p>"WebQ transformed our online presence... an impeccable design sense and a seamless process. Highly recommended!"</p>
+                    <h4>- Alex Johnson, CEO of Innovate Inc.</h4>
+                </div>
+                <div class="review-card animate-on-scroll">
+                    <p>"The posters and ad creatives they designed were fantastic and significantly boosted our campaign engagement."</p>
+                    <h4>- Sarah Chen, Marketing Director</h4>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 WebQ. All Rights Reserved.</p>
+            <div class="social-links"><a href="https://www.instagram.com/webq_/?__pwa=1" target="_blank">Instagram</a>
+            </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // --- PRELOADER ---
+            const preloader = document.querySelector('.preloader');
+            window.addEventListener('load', () => {
+                preloader.classList.add('fade-out');
+            });
+
+            let mouseX = 0,
+                mouseY = 0;
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+                mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+            });
+
+            // --- BACKGROUND 3D STARFIELD ---
+            let bgScene, bgCamera, bgRenderer, stars;
+            const bgCanvas = document.getElementById('background-canvas');
+
+            function initBackground3D() {
+                bgScene = new THREE.Scene();
+                bgCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
+                bgCamera.position.z = 1;
+
+                bgRenderer = new THREE.WebGLRenderer({
+                    canvas: bgCanvas,
+                    alpha: true
+                });
+                bgRenderer.setSize(window.innerWidth, window.innerHeight);
+
+                const starGeo = new THREE.BufferGeometry();
+                const starCount = 5000;
+                const positions = new Float32Array(starCount * 3);
+                for (let i = 0; i < starCount * 3; i++) {
+                    positions[i] = (Math.random() - 0.5) * 100;
+                }
+                starGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+                const starMat = new THREE.PointsMaterial({
+                    color: 0xaaaaaa,
+                    size: 0.05
+                });
+                stars = new THREE.Points(starGeo, starMat);
+                bgScene.add(stars);
+            }
+
+            function animateBackground() {
+                requestAnimationFrame(animateBackground);
+                stars.rotation.x += (mouseY * 0.1 - stars.rotation.x) * 0.01;
+                stars.rotation.y += (mouseX * 0.1 - stars.rotation.y) * 0.01;
+                bgRenderer.render(bgScene, bgCamera);
+            }
+
+            window.addEventListener('scroll', () => {
+                bgCamera.position.z = 1 + window.scrollY * 0.005;
+            });
+
+
+            // --- HERO 3D BACKGROUND ---
+            let heroScene, heroCamera, heroRenderer, heroShape;
+            const heroCanvas = document.getElementById('hero-canvas');
+
+            function initHero3D() {
+                heroScene = new THREE.Scene();
+                heroCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                heroRenderer = new THREE.WebGLRenderer({
+                    canvas: heroCanvas,
+                    alpha: true
+                });
+                heroRenderer.setSize(window.innerWidth, window.innerHeight);
+                const geometry = new THREE.IcosahedronGeometry(2.5, 0);
+                const material = new THREE.MeshStandardMaterial({
+                    color: 0x915EFF,
+                    wireframe: true
+                });
+                heroShape = new THREE.Mesh(geometry, material);
+                heroScene.add(heroShape);
+                const pointLight = new THREE.PointLight(0xffffff);
+                pointLight.position.set(5, 5, 5);
+                heroScene.add(pointLight);
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+                heroScene.add(ambientLight);
+                heroCamera.position.z = 5;
+            }
+
+            function animateHero() {
+                requestAnimationFrame(animateHero);
+                heroShape.rotation.x += 0.001;
+                heroShape.rotation.y += 0.001;
+                heroShape.rotation.x += (mouseY * 0.1 - heroShape.rotation.x) * 0.02;
+                heroShape.rotation.y += (mouseX * 0.1 - heroShape.rotation.y) * 0.02;
+                heroRenderer.render(heroScene, heroCamera);
+            }
+
+            // --- ABOUT SECTION 3D LAPTOP ---
+            let aboutScene, aboutCamera, aboutRenderer, laptopModel;
+            const aboutContainer = document.getElementById('about-canvas-container');
+
+            function initAbout3D() {
+                aboutScene = new THREE.Scene();
+                aboutCamera = new THREE.PerspectiveCamera(75, aboutContainer.clientWidth / aboutContainer.clientHeight, 0.1, 1000);
+                aboutRenderer = new THREE.WebGLRenderer({
+                    alpha: true
+                });
+                aboutRenderer.setSize(aboutContainer.clientWidth, aboutContainer.clientHeight);
+                aboutContainer.appendChild(aboutRenderer.domElement);
+
+                const group = new THREE.Group();
+                const screen = new THREE.Mesh(new THREE.BoxGeometry(2.5, 1.5, 0.1), new THREE.MeshStandardMaterial({
+                    color: 0x222222,
+                    roughness: 0.5
+                }));
+                const keyboard = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.1, 1.5), new THREE.MeshStandardMaterial({
+                    color: 0x333333,
+                    roughness: 0.5
+                }));
+                keyboard.position.y = -0.8;
+                keyboard.position.z = 0.65;
+                keyboard.rotation.x = -0.2;
+                group.add(screen);
+                group.add(keyboard);
+                laptopModel = group;
+
+                aboutScene.add(laptopModel);
+                const pointLight = new THREE.PointLight(0xffffff, 0.8);
+                pointLight.position.set(2, 3, 4);
+                aboutScene.add(pointLight);
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+                aboutScene.add(ambientLight);
+                aboutCamera.position.z = 3;
+            }
+            let lastScrollY = window.scrollY;
+
+            function animateAbout() {
+                requestAnimationFrame(animateAbout);
+                laptopModel.rotation.y += 0.005;
+                const scrollDelta = window.scrollY - lastScrollY;
+                laptopModel.rotation.x += scrollDelta * 0.001;
+                lastScrollY = window.scrollY;
+                aboutRenderer.render(aboutScene, aboutCamera);
+            }
+
+            function onWindowResize() {
+                bgCamera.aspect = window.innerWidth / window.innerHeight;
+                bgCamera.updateProjectionMatrix();
+                bgRenderer.setSize(window.innerWidth, window.innerHeight);
+
+                heroCamera.aspect = window.innerWidth / window.innerHeight;
+                heroCamera.updateProjectionMatrix();
+                heroRenderer.setSize(window.innerWidth, window.innerHeight);
+
+                if (aboutContainer && aboutContainer.clientWidth > 0) {
+                    aboutCamera.aspect = aboutContainer.clientWidth / aboutContainer.clientHeight;
+                    aboutCamera.updateProjectionMatrix();
+                    aboutRenderer.setSize(aboutContainer.clientWidth, aboutContainer.clientHeight);
+                }
+            }
+            window.addEventListener('resize', onWindowResize, false);
+
+            initBackground3D();
+            animateBackground();
+            initHero3D();
+            animateHero();
+            initAbout3D();
+            animateAbout();
+
+            // --- CUSTOM CURSOR ---
+            const cursorDot = document.querySelector(".cursor-dot");
+            const cursorOutline = document.querySelector(".cursor-outline");
+            window.addEventListener("mousemove", (e) => {
+                cursorDot.style.left = `${e.clientX}px`;
+                cursorDot.style.top = `${e.clientY}px`;
+                cursorOutline.animate({
+                    left: `${e.clientX}px`,
+                    top: `${e.clientY}px`
+                }, {
+                    duration: 500,
+                    fill: "forwards"
+                });
+            });
+
+            // --- MAGNETIC LINKS ---
+            const magneticLinks = document.querySelectorAll('.magnetic-link');
+            magneticLinks.forEach(link => {
+                link.addEventListener('mousemove', (e) => {
+                    const {
+                        offsetX,
+                        offsetY,
+                        target
+                    } = e;
+                    const {
+                        clientWidth,
+                        clientHeight
+                    } = target;
+                    const x = (offsetX / clientWidth) - 0.5;
+                    const y = (offsetY / clientHeight) - 0.5;
+                    target.style.transform = `translate(${x * 20}px, ${y * 20}px)`;
+                });
+                link.addEventListener('mouseleave', (e) => {
+                    e.target.style.transform = 'translate(0, 0)';
+                });
+            });
+
+            // --- SCROLL ANIMATIONS ---
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('visible');
+                });
+            }, {
+                threshold: 0.1
+            });
+            document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+
+</html>
