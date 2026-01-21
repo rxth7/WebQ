@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebQ | Premium Digital Creative Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+         :root {
+            --primary: #4f46e5;
+            --primary-light: #818cf8;
+            --accent: #06b6d4;
+            --bg: #ffffff;
+            --surface: #f8fafc;
+        }
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .hero-mesh {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            background-image: radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+            filter: blur(100px) opacity(0.05);
+            z-index: -1;
+        }
+        
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+        
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .btn-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .btn-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4);
+        }
+        
+        .service-img {
+            transition: transform 0.5s ease;
+        }
+        
+        .service-card:hover .service-img {
+            transform: scale(1.05);
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-15px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+        
+        .float-anim {
+            animation: float 4s ease-in-out infinite;
+        }
+        /* Modal Styles */
+        
+        .modal-overlay {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+        /* Success Animation */
+        
+        @keyframes success-pop {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .success-anim {
+            animation: success-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        /* Pricing Scroll Styles */
+        
+        .pricing-container {
+            display: flex;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            gap: 1.5rem;
+            padding: 1rem 0 2.5rem 0;
+        }
+        /* Conditional Scrollbar Removal for Mobile */
+        
+        @media (max-width: 768px) {
+            .pricing-container {
+                scrollbar-width: none;
+                /* Firefox */
+                -ms-overflow-style: none;
+                /* IE/Edge */
+            }
+            .pricing-container::-webkit-scrollbar {
+                display: none;
+                /* Chrome/Safari */
+            }
+        }
+        /* Styled Scrollbar for PC */
+        
+        @media (min-width: 769px) {
+            .pricing-container::-webkit-scrollbar {
+                height: 6px;
+                display: block;
+            }
+            .pricing-container::-webkit-scrollbar-track {
+                background: #f1f5f9;
+                border-radius: 10px;
+            }
+            .pricing-container::-webkit-scrollbar-thumb {
+                background: #cbd5e1;
+                border-radius: 10px;
+            }
+            .pricing-container::-webkit-scrollbar-thumb:hover {
+                background: #4f46e5;
+            }
+        }
+        
+        .pricing-card {
+            flex: 0 0 300px;
+            background: white;
+            border-radius: 2rem;
+            padding: 2rem;
+            border: 1px solid #f1f5f9;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        @media (min-width: 768px) {
+            .pricing-card {
+                flex: 0 0 calc(33.333% - 1rem);
+            }
+        }
+        
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+    </style>
+</head>
+
+<body class="selection:bg-indigo-100 selection:text-indigo-700">
+
+    <!-- Service Detail Modal -->
+    <div id="serviceModal" class="modal-overlay">
+        <div class="modal-content bg-white w-full max-w-xl rounded-[40px] shadow-2xl overflow-hidden relative">
+            <button onclick="closeModal()" class="absolute top-6 right-6 w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-200 transition">
+                <i class="fas fa-times"></i>
+            </button>
+            <div id="modalBody" class="p-10">
+                <!-- Content injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass top-0 shadow-sm">
+        <div class="max-w-7xl mx-auto px-3 md:px-6 h-14 md:h-20 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center gap-1.5 md:gap-2">
+                <div class="w-7 h-7 md:w-10 md:h-10 bg-indigo-600 rounded-lg md:rounded-xl flex items-center justify-center text-white shadow-indigo-200 shadow-lg">
+                    <span class="text-sm md:text-xl italic">Q</span>
+                </div>
+                <span class="text-sm md:text-2xl font-bold tracking-tight text-slate-900">Web<span class="text-indigo-600">Q</span></span>
+            </div>
+
+            <!-- Combined Nav Links -->
+            <div class="flex gap-2.5 md:gap-10 text-[9px] md:text-sm font-bold md:font-semibold text-slate-600">
+                <a href="#home" class="hover:text-indigo-600 transition">Home</a>
+                <a href="#about" class="hover:text-indigo-600 transition">About</a>
+                <a href="#services" class="hover:text-indigo-600 transition">Services</a>
+                <a href="#pricing" class="hover:text-indigo-600 transition">Pricing</a>
+            </div>
+
+            <!-- Action Button -->
+            <div class="flex items-center">
+                <a href="#order" class="bg-indigo-600 text-white px-3 md:px-6 py-1.5 md:py-3 rounded-lg md:rounded-2xl text-[9px] md:text-sm font-bold btn-hover whitespace-nowrap">Book Now</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="relative pt-24 md:pt-40 pb-8 md:pb-20 px-6 overflow-hidden min-h-screen flex items-center">
+        <div class="hero-mesh"></div>
+        <div class="max-w-7xl mx-auto grid grid-cols-2 gap-4 md:gap-12 items-center">
+            <div class="reveal active">
+                <span class="inline-block px-2 md:px-4 py-1 md:py-2 rounded-full bg-indigo-50 text-indigo-600 text-[8px] md:text-xs font-bold uppercase tracking-widest mb-4 md:mb-6 text-center w-full md:w-auto">
+                    Digital Creative Studio
+                </span>
+                <h1 class="text-xl md:text-7xl font-extrabold text-slate-900 leading-[1.1] mb-4 md:mb-8">
+                    We Build <span class="text-indigo-600">Premium</span> Digital Experiences.
+                </h1>
+                <p class="text-[10px] md:text-lg text-slate-600 mb-6 md:mb-10 leading-relaxed max-w-xl">
+                    WebQ helps brands stand out with high-end web development, stunning UI/UX, and professional video editing. Crafted with precision for high-growth businesses.
+                </p>
+                <div class="flex flex-wrap gap-2 md:gap-4">
+                    <a href="#order" class="bg-indigo-600 text-white px-4 md:px-8 py-2 md:py-4 rounded-xl md:rounded-2xl font-bold text-xs md:text-lg btn-hover flex items-center gap-2">
+                        Get Started <i class="fas fa-arrow-right text-[10px]"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="relative reveal active delay-200">
+                <div class="relative z-10 rounded-[20px] md:rounded-[40px] overflow-hidden shadow-2xl border-4 md:border-8 border-white float-anim">
+                    <img src="sales.png" alt="UI Design" class="w-full">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-8 md:py-24 px-6 bg-slate-50">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-2 gap-6 md:gap-16 items-center">
+                <div class="reveal">
+                    <img src="Group.png" class="rounded-[20px] md:rounded-[40px] shadow-xl" alt="WebQ Team">
+                </div>
+                <div class="reveal">
+                    <h2 class="text-base md:text-4xl font-extrabold text-slate-900 mb-4 md:mb-6">A studio built on <span class="text-indigo-600">Creativity & Trust</span>.</h2>
+                    <p class="text-slate-600 text-[10px] md:text-lg leading-relaxed mb-4 md:mb-8">
+                        WebQ is a modern digital studio that helps individuals and businesses build a strong online presence through high-quality solutions.
+                    </p>
+                    <div class="grid grid-cols-2 gap-3 md:gap-6">
+                        <div class="p-3 md:p-6 bg-white rounded-2xl md:rounded-3xl shadow-sm border border-slate-100 text-center">
+                            <i class="fas fa-rocket text-indigo-600 text-base md:text-2xl mb-2 md:mb-4"></i>
+                            <h4 class="font-bold text-slate-900 text-xs md:text-base">Fast Delivery</h4>
+                        </div>
+                        <div class="p-3 md:p-6 bg-white rounded-2xl md:rounded-3xl shadow-sm border border-slate-100 text-center">
+                            <i class="fas fa-shield-alt text-cyan-600 text-base md:text-2xl mb-2 md:mb-4"></i>
+                            <h4 class="font-bold text-slate-900 text-xs md:text-base">Reliability</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-8 md:py-24 px-6 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center max-w-2xl mx-auto mb-8 md:mb-16 reveal">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">Crafting Excellence</h2>
+                <p class="text-slate-500 text-sm md:text-lg">Detailed digital services focused on quality and performance.</p>
+            </div>
+
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+                <!-- Service 1 -->
+                <div class="service-card reveal group">
+                    <div class="overflow-hidden rounded-2xl md:rounded-3xl mb-4 md:mb-6 shadow-md h-32 md:h-48 bg-indigo-50">
+                        <img src="web Dev.png" alt="Web Dev" class="service-img w-full h-full object-cover grayscale group-hover:grayscale-0">
+                    </div>
+                    <h3 class="text-sm md:text-xl font-bold text-slate-900 mb-2">Web Development</h3>
+                    <p class="text-slate-500 text-[10px] md:text-sm mb-4">Responsive websites that load fast.</p>
+                    <button onclick="openModal('web')" class="text-indigo-600 font-bold text-[10px] md:text-sm inline-flex items-center gap-1 md:gap-2 group-hover:gap-4 transition-all">
+                        Learn More <i class="fas fa-arrow-right text-[8px]"></i>
+                    </button>
+                </div>
+                <!-- Service 2 -->
+                <div class="service-card reveal group delay-100">
+                    <div class="overflow-hidden rounded-2xl md:rounded-3xl mb-4 md:mb-6 shadow-md h-32 md:h-48 bg-cyan-50">
+                        <img src="ui ux.png" alt="UI/UX" class="service-img w-full h-full object-cover grayscale group-hover:grayscale-0">
+                    </div>
+                    <h3 class="text-sm md:text-xl font-bold text-slate-900 mb-2">UI/UX Design</h3>
+                    <p class="text-slate-500 text-[10px] md:text-sm mb-4">User-centric interface design.</p>
+                    <button onclick="openModal('ui')" class="text-indigo-600 font-bold text-[10px] md:text-sm inline-flex items-center gap-1 md:gap-2 group-hover:gap-4 transition-all">
+                        Learn More <i class="fas fa-arrow-right text-[8px]"></i>
+                    </button>
+                </div>
+                <!-- Service 3 -->
+                <div class="service-card reveal group delay-200">
+                    <div class="overflow-hidden rounded-2xl md:rounded-3xl mb-4 md:mb-6 shadow-md h-32 md:h-48 bg-pink-50">
+                        <img src="poster.png" alt="Poster Design" class="service-img w-full h-full object-cover grayscale group-hover:grayscale-0">
+                    </div>
+                    <h3 class="text-sm md:text-xl font-bold text-slate-900 mb-2">Poster Design</h3>
+                    <p class="text-slate-500 text-[10px] md:text-sm mb-4">Memorable identities and visuals.</p>
+                    <button onclick="openModal('branding')" class="text-indigo-600 font-bold text-[10px] md:text-sm inline-flex items-center gap-1 md:gap-2 group-hover:gap-4 transition-all">
+                        Learn More <i class="fas fa-arrow-right text-[8px]"></i>
+                    </button>
+                </div>
+                <!-- Service 4 -->
+                <div class="service-card reveal group delay-300">
+                    <div class="overflow-hidden rounded-2xl md:rounded-3xl mb-4 md:mb-6 shadow-md h-32 md:h-48 bg-purple-50">
+                        <img src="Video Editing.png" alt="Video Editing" class="service-img w-full h-full object-cover grayscale group-hover:grayscale-0">
+                    </div>
+                    <h3 class="text-sm md:text-xl font-bold text-slate-900 mb-2">Video Editing</h3>
+                    <p class="text-slate-500 text-[10px] md:text-sm mb-4">Post-production for social media.</p>
+                    <button onclick="openModal('video')" class="text-indigo-600 font-bold text-[10px] md:text-sm inline-flex items-center gap-1 md:gap-2 group-hover:gap-4 transition-all">
+                        Learn More <i class="fas fa-arrow-right text-[8px]"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-8 md:py-24 px-6 bg-slate-50 overflow-hidden">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-8 md:mb-12 reveal">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">Transparent Pricing</h2>
+                <p class="text-slate-500 text-sm md:text-lg">Premium solutions starting at competitive rates.</p>
+            </div>
+
+            <div class="pricing-container reveal" id="pricingScroll">
+                <!-- Website Pricing -->
+                <div class="pricing-card border-indigo-500/20">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600"><i class="fas fa-code"></i></div>
+                        <h3 class="font-bold text-slate-900">Web Development</h3>
+                    </div>
+                    <div class="text-3xl font-extrabold text-slate-900 mb-6">₹999<span class="text-sm font-normal text-slate-400">/start</span></div>
+                    <ul class="text-xs space-y-4 text-slate-500 mb-8">
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Custom .web.app domain included</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Free Hosting & Maintenance</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Static Website (3-5 Pages)</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Mobile Responsive & SEO Ready</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> SSL Security Certification</li>
+                    </ul>
+                    <button onclick="selectService('web')" class="block w-full text-center py-3 bg-indigo-600 text-white rounded-xl font-bold btn-hover">Choose Web</button>
+                </div>
+
+                <!-- UI/UX Pricing -->
+                <div class="pricing-card">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 bg-cyan-100 rounded-lg flex items-center justify-center text-cyan-600"><i class="fas fa-pen-nib"></i></div>
+                        <h3 class="font-bold text-slate-900">UI/UX Design</h3>
+                    </div>
+                    <div class="text-3xl font-extrabold text-slate-900 mb-6">₹999<span class="text-sm font-normal text-slate-400">/start</span></div>
+                    <ul class="text-xs space-y-4 text-slate-500 mb-8">
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> User Interface Research</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> High-Fidelity Figma Designs</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Interactive Prototypes</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Custom Design System</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Branding Elements integration</li>
+                    </ul>
+                    <button onclick="selectService('design')" class="block w-full text-center py-3 bg-slate-900 text-white rounded-xl font-bold btn-hover">Choose UI/UX</button>
+                </div>
+
+                <!-- Poster Pricing -->
+                <div class="pricing-card">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center text-pink-600"><i class="fas fa-image"></i></div>
+                        <h3 class="font-bold text-slate-900">Poster Design</h3>
+                    </div>
+                    <div class="text-3xl font-extrabold text-slate-900 mb-6">₹350<span class="text-sm font-normal text-slate-400">/start</span></div>
+                    <ul class="text-xs space-y-4 text-slate-500 mb-8">
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Social Media & Marketing Posts</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> High-Resolution Print Ready</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Multiple Formats (PNG, JPG, PDF)</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> 24-Hour Express Delivery</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Custom Visual Assets</li>
+                    </ul>
+                    <button onclick="selectService('branding')" class="block w-full text-center py-3 bg-slate-900 text-white rounded-xl font-bold btn-hover">Choose Poster</button>
+                </div>
+
+                <!-- Video Pricing -->
+                <div class="pricing-card">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600"><i class="fas fa-video"></i></div>
+                        <h3 class="font-bold text-slate-900">Video Editing</h3>
+                    </div>
+                    <div class="text-3xl font-extrabold text-slate-900 mb-6">₹400<span class="text-sm font-normal text-slate-400">/start</span></div>
+                    <ul class="text-xs space-y-4 text-slate-500 mb-8">
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Cinematic Color Grading</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Audio Mastering & Sound Design</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Premium Motion Graphics</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> Optimized for YouTube & Social Ads</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i> 4K/1080p High Quality Output</li>
+                    </ul>
+                    <button onclick="selectService('video')" class="block w-full text-center py-3 bg-slate-900 text-white rounded-xl font-bold btn-hover">Choose Video</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking/Order Section -->
+    <section id="order" class="py-8 md:py-24 px-6">
+        <div class="max-w-4xl mx-auto bg-white rounded-[30px] md:rounded-[50px] shadow-2xl border border-slate-100 overflow-hidden reveal">
+            <div class="grid grid-cols-5 min-h-[300px] md:min-h-[650px]">
+                <!-- Contact Side -->
+                <div class="col-span-2 bg-indigo-600 p-4 md:p-12 text-white flex flex-col justify-between">
+                    <div>
+                        <h2 class="text-sm md:text-3xl font-bold mb-4 md:mb-6">Fuel Your Vision</h2>
+                        <p class="text-[8px] md:text-base text-indigo-100 mb-4 md:mb-8 leading-relaxed">
+                            Join 50+ clients who trusted us with their growth. Let's create something extraordinary together.
+                        </p>
+
+                        <div class="space-y-3 md:space-y-6 mb-4 md:mb-8">
+                            <a href="mailto:webqstudio0@gmail.com" class="flex items-center gap-2 md:gap-4 hover:opacity-80 transition">
+                                <div class="w-6 h-6 md:w-10 md:h-10 bg-indigo-500 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fas fa-envelope text-[8px] md:text-base"></i></div>
+                                <span class="text-[7px] md:text-sm font-semibold truncate">webqstudio0@gmail.com</span>
+                            </a>
+                            <div class="flex items-center gap-2 md:gap-4">
+                                <div class="w-6 h-6 md:w-10 md:h-10 bg-indigo-500 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fab fa-instagram text-[8px] md:text-base"></i></div>
+                                <span class="text-[7px] md:text-sm font-semibold truncate">@webq_studio</span>
+                            </div>
+                            <div class="flex items-center gap-2 md:gap-4">
+                                <div class="w-6 h-6 md:w-10 md:h-10 bg-indigo-500 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fab fa-facebook text-[8px] md:text-base"></i></div>
+                                <span class="text-[7px] md:text-sm font-semibold truncate">WebQ Studio Official</span>
+                            </div>
+                            <div class="flex items-center gap-2 md:gap-4">
+                                <div class="w-6 h-6 md:w-10 md:h-10 bg-indigo-500 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fab fa-whatsapp text-[8px] md:text-base"></i></div>
+                                <span class="text-[7px] md:text-sm font-semibold truncate">Official Channel</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 md:space-y-6 border-t border-white/10 pt-4 md:pt-6">
+                            <div class="flex items-start gap-2 md:gap-4">
+                                <i class="fas fa-bolt text-[8px] md:text-xs text-indigo-300 mt-1"></i>
+                                <p class="text-[6px] md:text-xs text-indigo-100 opacity-80">Quick turnaround on all premium projects.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 flex gap-3 md:gap-6">
+                        <a href="https://www.facebook.com/profile.php?id=61586606954553" target="_blank" class="text-[10px] md:text-xl hover:text-indigo-200 transition"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/webq_" target="_blank" class="text-[10px] md:text-xl hover:text-indigo-200 transition"><i class="fab fa-instagram"></i></a>
+                        <a href="https://whatsapp.com/channel/0029Vb6cdNIADTOJB4xsTt0G" target="_blank" class="text-[10px] md:text-xl hover:text-indigo-200 transition"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+
+                <!-- Dynamic Form Side -->
+                <div id="formContainer" class="col-span-3 p-4 md:p-12 bg-white relative overflow-y-auto">
+                    <form id="orderForm" class="space-y-4 md:space-y-5">
+                        <div class="grid grid-cols-2 gap-2 md:gap-4">
+                            <div>
+                                <label class="block text-[8px] md:text-xs font-bold text-slate-400 uppercase mb-1">Name</label>
+                                <input type="text" name="name" required class="w-full bg-slate-50 border border-slate-100 rounded-lg md:rounded-2xl px-2 md:px-5 py-2 md:py-3 text-[10px] md:text-base focus:ring-1 focus:ring-indigo-600 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[8px] md:text-xs font-bold text-slate-400 uppercase mb-1">Email</label>
+                                <input type="email" name="email" required class="w-full bg-slate-50 border border-slate-100 rounded-lg md:rounded-2xl px-2 md:px-5 py-2 md:py-3 text-[10px] md:text-base focus:ring-1 focus:ring-indigo-600 outline-none">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 md:gap-4">
+                            <div>
+                                <label class="block text-[8px] md:text-xs font-bold text-slate-400 uppercase mb-1">Primary Phone</label>
+                                <input type="tel" name="phone" required class="w-full bg-slate-50 border border-slate-100 rounded-lg md:rounded-2xl px-2 md:px-5 py-2 md:py-3 text-[10px] md:text-base focus:ring-1 focus:ring-indigo-600 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[8px] md:text-xs font-bold text-slate-400 uppercase mb-1">Ext Phone (Opt)</label>
+                                <input type="tel" name="ext_phone" class="w-full bg-slate-50 border border-slate-100 rounded-lg md:rounded-2xl px-2 md:px-5 py-2 md:py-3 text-[10px] md:text-base focus:ring-1 focus:ring-indigo-600 outline-none">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 md:gap-4">
+                            <div>
+                                <label class="block text-[8px] md:text-xs font-bold text-slate-400 uppercase mb-1">Place</label>
+                                <input type="text" name="place" required class="w-full bg-slate-50 border border-slate-100 rounded-lg md:rounded-2xl px-2 md:px-5 py-2 md:py-3 text-[10px] md:text-base focus:ring-1 focus:ring-indigo-600 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[8px] md:text-xs font-bold text-slate-400 uppercase mb-1">Language</label>
+                                <input type="text" name="language" required class="w-full bg-slate-50 border border-slate-100 rounded-lg md:rounded-2xl px-2 md:px-5 py-2 md:py-3 text-[10px] md:text-base focus:ring-1 focus:ring-indigo-600 outline-none">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[8px] md:text-xs font-bold text-slate-400 uppercase mb-1">Preference</label>
+                            <div class="flex flex-wrap gap-2">
+                                <label class="flex items-center gap-1 text-[8px] md:text-sm text-slate-600 cursor-pointer">
+                                    <input type="radio" name="contact_pref" value="whatsapp" required class="accent-indigo-600"> WhatsApp
+                                </label>
+                                <label class="flex items-center gap-1 text-[8px] md:text-sm text-slate-600 cursor-pointer">
+                                    <input type="radio" name="contact_pref" value="call" required class="accent-indigo-600"> Call
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[8px] md:text-xs font-bold text-slate-400 uppercase mb-1">Select Service</label>
+                            <div class="grid grid-cols-2 gap-1 md:gap-2">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="service" value="web" required class="hidden peer" onchange="detectService('web')">
+                                    <span class="block px-1 md:px-4 py-1 md:py-3 bg-slate-50 rounded-lg md:rounded-2xl text-[8px] md:text-xs font-bold text-center peer-checked:bg-indigo-600 peer-checked:text-white transition">Web Dev</span>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="service" value="design" class="hidden peer" onchange="detectService('design')">
+                                    <span class="block px-1 md:px-4 py-1 md:py-3 bg-slate-50 rounded-lg md:rounded-2xl text-[8px] md:text-xs font-bold text-center peer-checked:bg-indigo-600 peer-checked:text-white transition">UI/UX</span>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="service" value="branding" class="hidden peer" onchange="detectService('branding')">
+                                    <span class="block px-1 md:px-4 py-1 md:py-3 bg-slate-50 rounded-lg md:rounded-2xl text-[8px] md:text-xs font-bold text-center peer-checked:bg-indigo-600 peer-checked:text-white transition">Poster Design</span>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="service" value="video" class="hidden peer" onchange="detectService('video')">
+                                    <span class="block px-1 md:px-4 py-1 md:py-3 bg-slate-50 rounded-lg md:rounded-2xl text-[8px] md:text-xs font-bold text-center peer-checked:bg-indigo-600 peer-checked:text-white transition">Video Edit</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[8px] md:text-xs font-bold text-slate-400 uppercase mb-1">Budget (₹)</label>
+                            <input type="number" name="budget" id="budgetManual" placeholder="Enter Amount" required class="w-full bg-slate-50 border border-slate-100 rounded-lg md:rounded-2xl px-2 md:px-5 py-2 md:py-3 text-[10px] md:text-base focus:ring-1 focus:ring-indigo-600 outline-none"
+                                oninput="validateBudget()">
+                            <p id="budgetAlert" class="text-[6px] md:text-[10px] mt-1 hidden font-bold"></p>
+                        </div>
+                        <!-- Compulsory T&C Checkbox -->
+                        <div class="flex items-start gap-2 pt-2">
+                            <input type="checkbox" id="tcCheck" required class="mt-1 accent-indigo-600">
+                            <label for="tcCheck" class="text-[8px] md:text-xs text-slate-500 leading-tight">
+                                I accept the <a href="T&c.html" class="text-indigo-600 font-bold underline">Terms & Conditions</a> and understand that WebQ will contact me personally.
+                            </label>
+                        </div>
+                        <button type="submit" id="submitBtn" class="w-full bg-indigo-600 text-white font-bold py-2 md:py-4 rounded-lg md:rounded-2xl shadow-lg text-[10px] md:text-base btn-hover flex items-center justify-center">
+                            Confirm Booking
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="py-8 md:py-24 px-6 max-w-3xl mx-auto">
+        <h2 class="text-3xl font-extrabold text-slate-900 mb-8 md:mb-12 text-center reveal">Everything you need to know</h2>
+        <div class="space-y-4 reveal">
+            <details class="group bg-slate-50 rounded-3xl p-6 border border-slate-100 overflow-hidden">
+                <summary class="flex justify-between items-center cursor-pointer font-bold list-none text-xs md:text-base">
+                    What is the first step?
+                    <i class="fas fa-plus text-[10px] md:text-xs group-open:rotate-45 transition"></i>
+                </summary>
+                <p class="mt-4 text-slate-500 text-xs md:text-sm leading-relaxed">Submit the form. We reach out personally within 24 hours.</p>
+            </details>
+            <details class="group bg-slate-50 rounded-3xl p-6 border border-slate-100 overflow-hidden">
+                <summary class="flex justify-between items-center cursor-pointer font-bold list-none text-xs md:text-base">
+                    Do you provide source files?
+                    <i class="fas fa-plus text-[10px] md:text-xs group-open:rotate-45 transition"></i>
+                </summary>
+                <p class="mt-4 text-slate-500 text-xs md:text-sm leading-relaxed">Yes, for Business and Enterprise tiers, all source files (Figma, PR, PSD) are provided upon completion.</p>
+            </details>
+            <details class="group bg-slate-50 rounded-3xl p-6 border border-slate-100 overflow-hidden">
+                <summary class="flex justify-between items-center cursor-pointer font-bold list-none text-xs md:text-base">
+                    What is your revision policy?
+                    <i class="fas fa-plus text-[10px] md:text-xs group-open:rotate-45 transition"></i>
+                </summary>
+                <p class="mt-4 text-slate-500 text-xs md:text-sm leading-relaxed">We offer multiple revision rounds depending on your chosen plan. Starter includes 1, while Business includes 3 rounds of changes.</p>
+            </details>
+            <details class="group bg-slate-50 rounded-3xl p-6 border border-slate-100 overflow-hidden">
+                <summary class="flex justify-between items-center cursor-pointer font-bold list-none text-xs md:text-base">
+                    How long does a typical project take?
+                    <i class="fas fa-plus text-[10px] md:text-xs group-open:rotate-45 transition"></i>
+                </summary>
+                <p class="mt-4 text-slate-500 text-xs md:text-sm leading-relaxed">Poster designs take 24-48 hours. Website and UI projects typically range from 5 to 14 business days.</p>
+            </details>
+            <details class="group bg-slate-50 rounded-3xl p-6 border border-slate-100 overflow-hidden">
+                <summary class="flex justify-between items-center cursor-pointer font-bold list-none text-xs md:text-base">
+                    Can you maintain my website after launch?
+                    <i class="fas fa-plus text-[10px] md:text-xs group-open:rotate-45 transition"></i>
+                </summary>
+                <p class="mt-4 text-slate-500 text-xs md:text-sm leading-relaxed">Absolutely. We offer monthly maintenance packages for security, performance updates, and small content changes.</p>
+            </details>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-white pt-12 md:pt-24 pb-12 px-6">
+        <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+            <div class="col-span-2">
+                <div class="text-xl md:text-3xl font-bold flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white italic">Q</div>
+                    WebQ Studio
+                </div>
+                <p class="text-slate-400 text-sm md:text-base max-w-sm mb-8 leading-relaxed">Elevating digital presence through intentional design and modern code. Reliable. Creative. Affordable.</p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="#order" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold text-sm transition">Book Project Now</a>
+                    <a href="mailto:webqstudio0@gmail.com" class="border border-slate-700 hover:bg-slate-800 px-6 py-3 rounded-xl font-bold text-sm transition flex items-center gap-2">
+                        <i class="fas fa-envelope"></i> Email Us
+                    </a>
+                </div>
+            </div>
+            <div>
+                <h4 class="font-bold text-white mb-6 uppercase tracking-widest text-xs">Quick Links</h4>
+                <ul class="space-y-4 text-slate-400 text-sm md:text-base">
+                    <li><a href="#home" class="hover:text-indigo-400 transition">Home</a></li>
+                    <li><a href="#about" class="hover:text-indigo-400 transition">About Studio</a></li>
+                    <li><a href="#services" class="hover:text-indigo-400 transition">Our Services</a></li>
+                    <li><a href="#pricing" class="hover:text-indigo-400 transition">Plan Pricing</a></li>
+                    <!-- New T&C Link -->
+                    <li><a href="T&c.html" class="hover:text-indigo-400 transition">Terms & Conditions</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-white mb-6 uppercase tracking-widest text-xs">Social Presence</h4>
+                <ul class="space-y-4 text-slate-400 text-sm md:text-base">
+                    <li><a href="https://www.instagram.com/webq_" target="_blank" class="hover:text-indigo-400 transition flex items-center gap-2"><i class="fab fa-instagram"></i> Instagram</a></li>
+                    <li><a href="https://www.facebook.com/profile.php?id=61586606954553" target="_blank" class="hover:text-indigo-400 transition flex items-center gap-2"><i class="fab fa-facebook"></i> Facebook</a></li>
+                    <li><a href="https://whatsapp.com/channel/0029Vb6cdNIADTOJB4xsTt0G" target="_blank" class="hover:text-indigo-400 transition flex items-center gap-2"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto text-center mt-8 md:mt-16 pt-8 border-t border-slate-800 text-slate-500 text-[10px] md:text-xs">
+            © 2025 WEBQ CREATIVE STUDIO. ALL RIGHTS RESERVED.
+        </div>
+    </footer>
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyXP4bKv0gh7B7nIyB1OjkZ-lkv6sDsPoxuzUvhb-QaQb0SHB90t4sWHwerLfQ_bGuL5g/exec';
+
+        let currentService = '';
+        const minBudgets = {
+            web: 999,
+            design: 999,
+            branding: 350,
+            video: 400
+        };
+
+        function detectService(val) {
+            currentService = val;
+            const radio = document.querySelector(`input[name="service"][value="${val}"]`);
+            if (radio) radio.checked = true;
+            validateBudget();
+        }
+
+        function selectService(val) {
+            detectService(val);
+            document.getElementById('order').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        function validateBudget() {
+            const budgetInput = document.getElementById('budgetManual');
+            const alertBox = document.getElementById('budgetAlert');
+            const val = parseInt(budgetInput.value);
+
+            if (!currentService) return;
+
+            const min = minBudgets[currentService];
+            if (val < min) {
+                alertBox.innerText = `Minimum: ₹${min} required.`;
+                alertBox.classList.remove('hidden');
+                alertBox.style.color = '#ef4444';
+            } else {
+                alertBox.innerText = `Valid budget for ${currentService}.`;
+                alertBox.classList.remove('hidden');
+                alertBox.style.color = '#10b981';
+            }
+        }
+
+        const serviceData = {
+            web: {
+                title: "Web Development",
+                desc: "High-performance websites using React, Next.js, and Tailwind CSS. Clean, SEO-optimized, and lightning-fast.",
+                points: ["Custom React Architecture", "Static Website (3-5 Pages)", "SEO Optimization", "Free Hosting setup", "Custom .web.app domain"]
+            },
+            ui: {
+                title: "UI/UX Design",
+                desc: "Focus on intuitive interfaces that guide users toward conversion while maintaining a premium visual aesthetic.",
+                points: ["User Journey Mapping", "High-Fidelity Prototyping", "Interactive Figma Handover", "Design Systems", "Custom Illustrations"]
+            },
+            branding: {
+                title: "Poster Design",
+                desc: "Professional poster and visual identity solutions that tell your story and resonate with your audience.",
+                points: ["Marketing Posters", "Social Media Kits", "High Resolution CMYK", "Brand Guidelines", "Commercial Flyers"]
+            },
+            video: {
+                title: "Video Editing",
+                desc: "Cinematic post-production for social media, ads, and YouTube. Premium motion graphics and transitions.",
+                points: ["Cinematic Grading", "Audio Mastering", "Motion Graphics", "4K Output", "Subtitle Integration"]
+            }
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('active');
+            });
+        }, {
+            threshold: 0.1
+        });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        function openModal(key) {
+            const data = serviceData[key];
+            document.getElementById('modalBody').innerHTML = `
+                <div class="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 text-2xl mb-6">
+                    <i class="fas fa-sparkles"></i>
+                </div>
+                <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 mb-4">${data.title}</h2>
+                <p class="text-slate-600 mb-8 text-sm md:text-base leading-relaxed">${data.desc}</p>
+                <div class="space-y-3">
+                    ${data.points.map(p => `<div class="flex items-center gap-3 text-slate-600 font-medium text-xs md:text-sm"><i class="fas fa-check-circle text-indigo-500"></i> ${p}</div>`).join('')}
+                </div>
+                <button onclick="closeModal(); selectService('${key}');" class="mt-10 w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold btn-hover">Book This Service</button>
+            `;
+            document.getElementById('serviceModal').classList.add('active');
+        }
+        function closeModal() { document.getElementById('serviceModal').classList.remove('active'); }
+
+        const form = document.getElementById('orderForm');
+        const submitBtn = document.getElementById('submitBtn');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const budgetVal = parseInt(document.getElementById('budgetManual').value);
+            if (!currentService) {
+                alert("Please select a service first.");
+                return;
+            }
+            if (budgetVal < minBudgets[currentService]) {
+                alert(`Please enter a budget of at least ₹${minBudgets[currentService]} for this service.`);
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<i class="fas fa-circle-notch fa-spin mr-2"></i> Submitting...`;
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+            
+            fetch(scriptURL, { method: 'POST', body: new URLSearchParams(formData) })
+            .then(res => res.text())
+            .then(response => {
+                document.getElementById('formContainer').innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center text-center p-4 success-anim">
+                        <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center text-2xl mb-4"><i class="fas fa-check"></i></div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Booking Confirmed!</h3>
+                        <p class="text-slate-500 text-[10px] mb-6">Thank you, ${data.name}. We've saved your request for ${data.service}.</p>
+                        <button onclick="location.reload()" class="bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold text-xs">Book Another</button>
+                    </div>
+                `;
+            })
+            .catch(error => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = "Confirm Booking";
+                alert('Connection error. Please try again.');
+            });
+        });
+    </script>
+</body>
+
+</html>
